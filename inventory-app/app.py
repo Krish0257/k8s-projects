@@ -6,7 +6,7 @@ app = Flask(__name__)
 def home():
     return {
         "application": "inventory-app",
-        "version": "v1"
+        "version": "v3"
     }
 
 if __name__ == "__main__":
