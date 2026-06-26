@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollout-app
+  namespace: release-lab
+spec:
+  replicas: 4
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: rollout-app
+  template:
+    metadata:
+      labels:
+        app: rollout-app
+    spec:
+      containers:
+        - name: rollout-app
+          image: inventory-app:v3
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+  strategy:
+        canary:
+          stableService: rollout-stable-service
+          canaryService: rollout-canary-service
+
+          trafficRouting:
+            nginx:
+              stableIngress: rollout-ingress
+          maxUnavailable: 0
+          maxSurge: 1
+          steps:
+            - setWeight: 10
+            - pause: {}
+            - setWeight: 25
+            - pause: {}
+            - setWeight: 50
+            - pause: {}
+            - setWeight: 100
