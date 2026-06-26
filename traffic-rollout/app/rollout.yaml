@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: rollout-app
-          image: inventory-app:v3
+          image: inventory-app:v1
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
